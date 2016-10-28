@@ -562,19 +562,11 @@ class S3BackUpService extends Service {
 				$errors['bucket'] = __( 'Could not connect to S3', 'backupwordpress' );
 			} else {
 				try {
-					$result = $this->s3->listBuckets( array() );
+					$this->s3->headBucket(array(
+						'Bucket' => $new_data['bucket'],
+					));
 				} catch ( \Exception $e ) {
-					$errors['bucket'] = sprintf( __( '%s', 'backupwordpress' ), $e->getMessage() );
-				}
-				$buckets = '';
-				if ( isset( $result['Buckets'] ) ) {
-					$buckets = wp_list_pluck( $result['Buckets'], 'Name' );
-				} else {
-					$errors['bucket'] = __( 'No buckets retrieved', 'backupwordpress' );
-				}
-
-				if ( $buckets && ! in_array( $new_data['bucket'], $buckets ) ) {
-					$errors['bucket'] = __( 'Bucket does not exist', 'backupwordpress' );
+					$errors['bucket'] = sprintf( __( 'Bucket error: %s', 'backupwordpress' ), $e->getMessage() );
 				}
 			}
 		}
